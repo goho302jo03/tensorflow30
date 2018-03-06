@@ -19,6 +19,12 @@ def conv2D(x, W):
 def max_pooling_2x2(x):
     return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
+def conv_layer(input, filter, ksize):
+    W_conv = weight_variable([ksize[0], ksize[1], ksize[2], filter])
+    b_conv = bias_variable([filter])
+    h_conv = tf.nn.relu(conv2D(input, W_conv)+b_conv)
+    h_pool = max_pooling_2x2(h_conv)
+    return h_pool
 
 if __name__ == '__main__':
 
@@ -28,15 +34,9 @@ if __name__ == '__main__':
     x = tf.placeholder(tf.float32, [None, 784])
     x_image = tf.reshape(x, [-1, 28, 28, 1])
     _y = tf.placeholder(tf.float32, [None, 10])
-    W_conv1 = weight_variable([5, 5, 1, 32])
-    b_conv1 = bias_variable([32])
-    h_conv1 = tf.nn.relu(conv2D(x_image, W_conv1)+b_conv1)
-    h_pool1 = max_pooling_2x2(h_conv1)
 
-    W_conv2 = weight_variable([5, 5, 32, 64])
-    b_conv2 = bias_variable([64])
-    h_conv2 = tf.nn.relu(conv2D(h_pool1, W_conv2)+b_conv2)
-    h_pool2 = max_pooling_2x2(h_conv2)
+    h_pool1 = conv_layer(x_image, 32, [5,5,1])
+    h_pool2 = conv_layer(h_pool1, 64, [5,5,32])
 
     h_pool2_flatten = tf.reshape(h_pool2, [-1, 7*7*64])
 
